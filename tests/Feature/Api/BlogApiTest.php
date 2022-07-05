@@ -19,7 +19,8 @@ use function Pest\Laravel\seed;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    seed([CategorySeeder::class, BlogSeeder::class]);
+    seed(CategorySeeder::class);
+    seed(BlogSeeder::class);
     Sanctum::actingAs(
         User::factory()->create()
     );
@@ -27,6 +28,7 @@ beforeEach(function () {
 });
 
 test('Get All Blog', function () {
+    seed(CategorySeeder::class);
     get("/api/blogs")->assertStatus(200);
 });
 
@@ -67,10 +69,10 @@ test('Insert Blog Success', function () {
 });
 
 test('Insert Blog Failed (Category Not Found)', function () {
-    $category = Category::latest()->first()->id + 10;
+    $category = Category::orderBy('id', 'DESC')->first()->id + 10;
     postJson("/api/blogs", [
         "name" => "Test Masukin Json gagal",
-        "categories" => "{$category},52,53",
+        "categories" => "{$category},2,3",
         "content" => "Test masukin json gagal bang"
     ])->assertStatus(404)->assertJson([
         "message" => "Category not found"
@@ -97,9 +99,10 @@ test("Update Blog Success", function () {
 });
 
 test("Update Blog Failed (No Such Blog)", function () {
+    $category = Category::orderBy('id', 'DESC')->first()->id + 10;
     putJson("/api/blogs/tidak-ada-pokoknya", [
         "name" => "Test Edit Blog",
-        "categories" => "51,52,53",
+        "categories" => "{$category},52,53",
         "content" => "test edit blog"
     ])->assertStatus(404)->assertJson([
         "message" => "Blog not found"
@@ -108,10 +111,9 @@ test("Update Blog Failed (No Such Blog)", function () {
 
 test("Update Blog Failed (No Such Category)", function () {
     $blog = Blog::inRandomOrder()->first();
-    $category = Category::latest()->first()->id + 10;
     $jsonContent = [
         "name" => "Test Edit Blog",
-        "categories" => "{$category},2,3",
+        "categories" => "1,2,3",
         "content" => "test edit blog"
     ];
     putJson("/api/blogs/{$blog->slug}", $jsonContent)->assertStatus(404)->assertJson([
