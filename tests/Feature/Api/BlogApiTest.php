@@ -9,7 +9,6 @@ use Laravel\Sanctum\Sanctum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 
-use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\delete;
 use function Pest\Laravel\get;
 use function Pest\Laravel\postJson;
@@ -24,7 +23,6 @@ beforeEach(function () {
     Sanctum::actingAs(
         User::factory()->create()
     );
-    assertDatabaseCount("blogs", 30);
 });
 
 test('Get All Blog', function () {

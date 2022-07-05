@@ -1,44 +1,32 @@
 <?php
 
-namespace Tests\Feature;
-
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 
-class AuthApiTest extends TestCase
-{
-    use RefreshDatabase;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\seed;
+use function Pest\Laravel\withHeader;
 
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-    public function test_user_exists()
-    {
-        $this->seed(UserSeeder::class);
+uses(RefreshDatabase::class);
 
-        $this->assertDatabaseHas('users', [
-            'email' => 'admin@mail.com'
-        ]);
-    }
+test("User Exists", function () {
+    seed(UserSeeder::class);
+    assertDatabaseHas('users', [
+        'email' => 'admin@mail.com'
+    ]);
+});
 
-    public function test_login_success()
-    {
-        $this->seed(UserSeeder::class);
-        $this->withHeader("Accept", "application/json")->postJson("/api/login", [
-            'email' => 'admin@mail.com',
-            'password' => 'admin123'
-        ])->assertStatus(200);
-    }
+test("Login Success", function () {
+    seed(UserSeeder::class);
+    withHeader("Accept", "application/json")->postJson("/api/login", [
+        'email' => 'admin@mail.com',
+        'password' => 'admin123'
+    ])->assertStatus(200);
+});
 
-    public function test_login_failed()
-    {
-        $this->withHeader("Accept", "application/json")->postJson("/api/login", [
-            'email' => 'wrong@cresidentials.com',
-            'password' => 'wrong123'
-        ])->assertStatus(401);
-    }
-}
+test("Login Failed", function () {
+    withHeader("Accept", "application/json")->postJson("/api/login", [
+        'email' => 'wrong@cresidentials.com',
+        'password' => 'wrong123'
+    ])->assertStatus(401);
+});
