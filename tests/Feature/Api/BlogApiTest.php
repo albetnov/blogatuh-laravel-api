@@ -99,10 +99,9 @@ test("Update Blog Success", function () {
 });
 
 test("Update Blog Failed (No Such Blog)", function () {
-    $category = Category::orderBy('id', 'DESC')->first()->id + 10;
     putJson("/api/blogs/tidak-ada-pokoknya", [
         "name" => "Test Edit Blog",
-        "categories" => "{$category},52,53",
+        "categories" => "1,2,3",
         "content" => "test edit blog"
     ])->assertStatus(404)->assertJson([
         "message" => "Blog not found"
@@ -110,10 +109,11 @@ test("Update Blog Failed (No Such Blog)", function () {
 });
 
 test("Update Blog Failed (No Such Category)", function () {
+    $category = Category::orderBy('id', 'DESC')->first()->id + 10;
     $blog = Blog::inRandomOrder()->first();
     $jsonContent = [
         "name" => "Test Edit Blog",
-        "categories" => "1,2,3",
+        "categories" => "{$category},2,3",
         "content" => "test edit blog"
     ];
     putJson("/api/blogs/{$blog->slug}", $jsonContent)->assertStatus(404)->assertJson([
